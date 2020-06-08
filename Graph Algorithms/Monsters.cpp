@@ -18,8 +18,8 @@ using namespace std;
 vector<string> v;
 int n, m;
  
-int dist[101][101];
-int d[101][101];
+int dist[1001][1001];
+int d[1001][1001];
  
 signed main() {
     ios::sync_with_stdio(false); 
@@ -52,6 +52,7 @@ signed main() {
             auto f = q.front();
             q.pop();
             int x = f[0], y = f[1], steps = f[2];
+            // cout << x << " " << y << endl;
             if(x < 0 || x > n - 1 || y < 0 || y > m - 1 || v[x][y] == '#' || dist[x][y] != -1) {
                 continue;
             }
@@ -60,13 +61,15 @@ signed main() {
             vi dy = { -1, 1, 0, 0 };
             for(int i = 0; i < 4; i++) {
                 int cx = x + dx[i], cy = y + dy[i];
+                if(cx < 0 || cx > n - 1 || cy < 0 || cy > m - 1 || v[cx][cy] == 'M')
+                    continue;
                 q.push({ cx, cy, steps + 1 });
             }
         }
         int cnt = 0;
         string ret;
         while(!q.empty())   q.pop();
-        q.push({ x, y, 0 });
+        q.push({ x, y, 0, 0 });
         memset(d, -1, sizeof d);
         bool ans = false;
         // L => 0, R => 1, U => 2, D => 3
@@ -78,11 +81,12 @@ signed main() {
             int x = f[0], y = f[1], steps = f[2], dir = f[3];
             if(x < 0 || x > n - 1 || y < 0 || y > m - 1 || v[x][y] == '#' || d[x][y] != -1 || (dist[x][y] >= 0 && dist[x][y] <= steps))
                 continue;
+            d[x][y] = steps;
+            p[x][y] = dir;
             if(x == n - 1 || y == m - 1 || x == 0 || y == 0) {
-                p[x][y] = dir;
+                // cout << d[x][y] << " " << dist[x][y] << endl;
                 while(x != c1 || y != c2) {
                     cnt++;
-                    // cout << x << " " << y << endl;
                     if(p[x][y] == 0)    ret += 'L', y++;
                     else if(p[x][y] == 1)   ret += 'R', y--;
                     else if(p[x][y] == 2)   ret += 'U', x++;
@@ -91,8 +95,6 @@ signed main() {
                 ans = true;
                 break;
             }
-            d[x][y] = steps;
-            p[x][y] = dir;
             vi dx = { 0, 0, -1, 1 };
             vi dy = { -1, 1, 0, 0 };
             for(int i = 0; i < 4; i++) {
@@ -100,19 +102,6 @@ signed main() {
                 q.push({ cx, cy, steps + 1, i });
             }
         }
-        // for(int i = 0; i < n; i++) {
-        //     for(int j = 0; j < m; j++) {
-        //         cout << dist[i][j] << " ";
-        //     }
-        //     cout << endl;
-        // }
-        // cout << endl;
-        // for(int i = 0; i < n; i++) {
-        //     for(int j = 0; j < m; j++) {
-        //         cout << d[i][j] << " ";
-        //     }
-        //     cout << endl;
-        // }
         if(ans) {
             reverse(ret.begin(), ret.end());
             cout << "YES" << endl << cnt << endl << ret;
@@ -121,5 +110,4 @@ signed main() {
             cout << "NO";
         cout << endl;
     }
-	return 0;
 }
